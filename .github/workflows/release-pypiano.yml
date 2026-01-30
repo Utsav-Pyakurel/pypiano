@@ -106,7 +106,7 @@ jobs:
 
   gather_analytics:
     name: Gather Analytics
-    needs: [make-github-release, make-github-release, tests]
+    needs: [make-pypi-release, make-github-release, tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
