@@ -13,6 +13,12 @@ jobs:
       matrix:
         python: [3.9]
     steps:
+      - name: Setup PSE
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY}}
+          
       - uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -42,6 +48,11 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      - name: Cleanup PSE
+        if: always()
+        uses: invisirisk/pse-action@latest
+        with:
+          cleanup: "true"
   make-pypi-release:
     name: Release to PyPI
     runs-on: ubuntu-latest
@@ -66,3 +77,16 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+  gather_analytics:
+    runs-on: ubuntu-latest
+    name: Gather Analytics
+    needs: tests
+    if: always()
+    steps:
+      - name: Gather Status
+        uses: invisirisk/pse-action@latest
+        with:
+          api_url: "https://app.invisirisk.com"
+          app_token: ${{secrets.IR_API_KEY}}
+          send_job_status: "true"
+          debug: "true"
