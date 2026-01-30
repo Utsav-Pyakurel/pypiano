@@ -2,7 +2,7 @@ permissions:
   checks: write
   contents: write
   packages: read
-name: release-pypiano
+name: pushes
 
 on:
   push:
