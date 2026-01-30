@@ -1,51 +1,23 @@
-
-name: release-pypiano1.2
+name: release-pypiano
 
 on:
   push:
     tags:
       - v*
-permissions:
-  checks: write
-  contents: write
-  packages: read
+
 jobs:
-  python-application-build:
-    runs-on: ubuntu-latest
-    name: Run build
   tests:
     name: Run tests and check code
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python: [3.9]
-      
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup PSE
-        uses: invisirisk/pse-action@latest
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{secrets.IR_API_KEY}}
-
-      - uses: actions/checkout@v4
-
-      - name: Use Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.13"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-
-      - name: Cleanup PSE
-        if: always()
-        uses: invisirisk/pse-action@latest
-        with:
-          cleanup: "true"
-          
+          python-version: ${{ matrix.python }}
       - name: Install Tox and any other packages
         run: |
           sudo apt-get update
@@ -94,16 +66,3 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
-  gather_analytics:
-    runs-on: ubuntu-latest
-    name: Gather Analytics
-    needs: python-application-build
-    if: always()
-    steps:
-      - name: Gather Status
-        uses: invisirisk/pse-action@latest
-        with:
-          api_url: "https://app.stage.invisirisk.com"
-          app_token: ${{secrets.IR_API_KEY}}
-          send_job_status: "true"
-          debug: "true"
