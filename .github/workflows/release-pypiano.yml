@@ -19,7 +19,10 @@ jobs:
     strategy:
       matrix:
         python: [3.9]
-    steps:    
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup PSE
         uses: invisirisk/pse-action@latest
         with:
